@@ -34,7 +34,7 @@ const link = (link: string) => {
 }
 </script>
 
-<style>
+<style lang="scss">
 .logos {
   display: flex;
   justify-content: space-around;
