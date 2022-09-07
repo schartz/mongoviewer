@@ -1,0 +1,12 @@
+{
+  "name": "MongoViewer",
+  "outputfilename": "MongoViewer",
+  "assetdir": "frontend/dist",
+  "wailsjsdir": "frontend/src",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "author": {
+    "name": "Schartz Rehan",
+    "email": "rehan.qt@gmail.com"
+  }
+}
