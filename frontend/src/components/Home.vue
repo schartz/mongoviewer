@@ -1,102 +1,137 @@
 <template>
-  <div class="logos">
-    <img class="wails" src="../assets/images/wails.svg" alt="wails">
-    <img class="vue" src="../assets/images/vue.svg" alt="vue">
+  <section class="hero is-danger is-fullheight">
+    <div class="hero-body">
+      <div class="">
+        <p class="title">
+          MongoViewer
+        </p>
+        <p class="subtitle">
+          Fullheight subtitle
+        </p>
+
+        <p class="subtitle" @click="openAddConnectionModal = true">
+          + Add a new connection
+        </p>
+
+        <div>
+          <table class="table">
+            <thead>
+            <tr>
+              Connection
+            </tr>
+            <tr>
+              Action
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr v-for="conn in result">
+              <td>
+                {{conn.conn}}
+              </td>
+              <td>
+                <button class="button is-primary">Connect</button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <div class="modal" :class="{'is-active': openAddConnectionModal}">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+      <div class="box">
+
+        <div class="field">
+          <label class="label">Connection name</label>
+          <div class="control">
+            <input v-model="newConnectionData.name" class="input" type="text" placeholder="Text input">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Connection URI</label>
+          <div class="control">
+            <input v-model="newConnectionData.uri" class="input" type="text" placeholder="Text input">
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link">Submit</button>
+          </div>
+          <div class="control">
+            <button class="button is-primary" @click="testConnection">Test Connection</button>
+          </div>
+          <div class="control">
+            <button class="button is-link is-light" @click="openAddConnectionModal = false">Cancel</button>
+          </div>
+        </div>
+
+
+        <button class="modal-close is-large" aria-label="close" @click="openAddConnectionModal = false"></button>
+
+
+      </div>
+
+
+
+      </div>
+
   </div>
-  <div class="links">
-    <a class="link" @click="link('https://wails.io')">Wails Docs</a> |
-    <a class="link" @click="link('https://v3.vuejs.org/guide')">Vue Docs</a> |
-    <a class="link" @click="link('https://github.com/codydbentley/wails-vite-vue-ts')">Template Docs</a>
-  </div>
-  <div class="result" id="result">{{ result }}</div>
-  <div class="input-box" id="input" data-wails-no-drag>
-    <input class="input" v-model="name" type="text" autocomplete="off">
-    <button class="btn" @click="greet()">Greet</button>
-  </div>
+
 </template>
 
 <script setup lang="ts">
 // This template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
+import { Notyf } from 'notyf';
 
-const result = ref("Please enter your name below 👇")
-const name = ref("")
+interface ConnectionData {
+  name: string,
+  uri: string,
+}
+const notyf = new Notyf({duration: 5000});
+const result = ref({})
+const openAddConnectionModal = ref(false)
+const newConnectionData = ref<ConnectionData>({
+  name: '',
+  uri: ''
+})
 
-const greet = () => {
-  window.go.main.App.Greet(name.value).then(response => {
-    result.value = response
+const fetchConnectionList = () => {
+  window.go.main.App.ConnectionList().then(response => {
+    result.value = JSON.parse(response)
+    console.log(response)
+    console.log(result.value)
   })
 }
 
-const link = (link: string) => {
-  window.runtime.BrowserOpenURL(link)
+const testConnection = () => {
+
+  window.go.main.App.TestConnection(newConnectionData.value.uri).then(response => {
+    if (response !== 'yes'){
+      notyf.error(response);
+    } else {
+      notyf.success('Connection Successfull');
+    }
+  })
 }
+
+
+
+onMounted(() => {
+  fetchConnectionList()
+})
 </script>
 
 <style lang="scss">
-.logos {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 50%;
-  width: 100%;
-}
 
-.logos img.wails {
-  max-width: 256px;
-  max-height: 256px;
-}
-
-.logos img.vue {
-  max-width: 256px;
-  max-height: 185px;
-}
-
-.links {
-  font-size: 20px;
-}
-
-.result {
-  height: 20px;
-  line-height: 20px;
-  margin: 1.5rem auto;
-}
-
-.input-box .btn {
-  width: 60px;
-  height: 30px;
-  line-height: 30px;
-  border-radius: 3px;
-  border: none;
-  margin: 0 0 0 20px;
-  padding: 0 8px;
-  cursor: pointer;
-}
-
-.input-box .btn:hover {
-  background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-  color: #333333;
-}
-
-.input-box .input {
-  border: none;
-  border-radius: 3px;
-  outline: none;
-  height: 30px;
-  line-height: 30px;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240, 1);
-  -webkit-font-smoothing: antialiased;
-}
-
-.input-box .input:hover {
-  border: none;
-  background-color: rgba(255, 255, 255, 1);
-}
-
-.input-box .input:focus {
-  border: none;
-  background-color: rgba(255, 255, 255, 1);
-}
 </style>

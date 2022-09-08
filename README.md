@@ -28,7 +28,7 @@ note that all commands should be run in the `frontend` directory.
 
 Installation:
 ```shell
-$ npm install --save-dev sass
+$ npm install --save-dist sass
 ```
 
 Usage:
@@ -45,7 +45,7 @@ styling like this:
 
 Installation:
 ```shell
-$ npm install --save-dev eslint prettier eslint-plugin-vue eslint-config-prettier @vue/eslint-config-typescript @typescript-eslint/parser @typescript-eslint/eslint-plugin
+$ npm install --save-dist eslint prettier eslint-plugin-vue eslint-config-prettier @vue/eslint-config-typescript @typescript-eslint/parser @typescript-eslint/eslint-plugin
 $ touch .eslintrc && touch .prettierrc
 ```
 

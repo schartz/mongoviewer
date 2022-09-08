@@ -28,21 +28,4 @@ html {
 body {
   margin: 0;
 }
-
-#app {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.link {
-  cursor: pointer;
-  color: #df0000;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
 </style>

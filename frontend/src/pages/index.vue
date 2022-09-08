@@ -9,40 +9,5 @@ import Home from '/@src/components/Home.vue'
 </script>
 
 <style lang="scss">
-@font-face {
-  font-family: "Nunito";
-  font-style: normal;
-  font-weight: 400;
-  src: local(""),
-  url("/@src/assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
-}
 
-html {
-  background-color: rgba(33, 37, 43, 1);
-  color: white;
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-  "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-  sans-serif;
-}
-
-body {
-  margin: 0;
-}
-
-#app {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.link {
-  cursor: pointer;
-  color: #df0000;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
 </style>
