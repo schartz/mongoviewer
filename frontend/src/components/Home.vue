@@ -1,41 +1,52 @@
 <template>
-  <section class="hero is-danger is-fullheight">
+  <section class="hero is-dark is-fullheight has-text-centered">
     <div class="hero-body">
-      <div class="">
-        <p class="title">
+      <div>
+        <p class="title mb-6">
           MongoViewer
         </p>
         <p class="subtitle">
-          Fullheight subtitle
+
         </p>
 
-        <p class="subtitle" @click="openAddConnectionModal = true">
-          + Add a new connection
-        </p>
-
-        <div>
-          <table class="table">
+        <div class="table-wrapper mb-6">
+          <table class="table is-striped is-narrow is-fullwidth" v-if="connectionList.length > 0">
             <thead>
-            <tr>
+            <th align="center">
               Connection
-            </tr>
-            <tr>
+            </th>
+            <th>
+              URI
+            </th>
+            <th>
               Action
-            </tr>
+            </th>
             </thead>
 
             <tbody>
-            <tr v-for="conn in result">
+            <tr v-for="conn in connectionList">
               <td>
-                {{conn.conn}}
+                {{conn.name}}
               </td>
               <td>
-                <button class="button is-primary">Connect</button>
+                {{conn.uri}}
+              </td>
+              <td>
+                <button class="button is-link is-small">Connect</button>
               </td>
             </tr>
             </tbody>
           </table>
+          <h1 v-else>
+            No saved connections
+          </h1>
         </div>
+
+        <p class="subtitle mt-6">
+          <button class="button  is-warning" @click="openAddConnectionModal = true">
+             + Add a new connection
+          </button>
+        </p>
       </div>
     </div>
   </section>
@@ -45,7 +56,9 @@
     <div class="modal-background"></div>
     <div class="modal-content">
       <div class="box">
-
+        <h5 class="is-size-5 mb-4">
+          Please fill in the connection information
+        </h5>
         <div class="field">
           <label class="label">Connection name</label>
           <div class="control">
@@ -64,7 +77,7 @@
 
         <div class="field is-grouped">
           <div class="control">
-            <button class="button is-link">Submit</button>
+            <button class="button is-link" @click="addConnection()">Submit</button>
           </div>
           <div class="control">
             <button class="button is-primary" @click="testConnection">Test Connection</button>
@@ -73,15 +86,8 @@
             <button class="button is-link is-light" @click="openAddConnectionModal = false">Cancel</button>
           </div>
         </div>
-
-
         <button class="modal-close is-large" aria-label="close" @click="openAddConnectionModal = false"></button>
-
-
       </div>
-
-
-
       </div>
 
   </div>
@@ -98,29 +104,41 @@ interface ConnectionData {
   name: string,
   uri: string,
 }
-const notyf = new Notyf({duration: 5000});
-const result = ref({})
+const notyf = new Notyf({duration: 5000, position:{x:'center',y:'top'}});
+const connectionList = ref([])
 const openAddConnectionModal = ref(false)
 const newConnectionData = ref<ConnectionData>({
-  name: '',
-  uri: ''
+  name: 'default',
+  uri: 'mongodb://localhost:27017'
 })
 
 const fetchConnectionList = () => {
   window.go.main.App.ConnectionList().then(response => {
-    result.value = JSON.parse(response)
-    console.log(response)
-    console.log(result.value)
+    if (response && response.length > 0){
+      connectionList.value = response
+    }
   })
 }
 
 const testConnection = () => {
-
   window.go.main.App.TestConnection(newConnectionData.value.uri).then(response => {
     if (response !== 'yes'){
       notyf.error(response);
     } else {
       notyf.success('Connection Successfull');
+    }
+  })
+}
+
+const addConnection = () => {
+  window.go.main.App.AddConnection(JSON.stringify(newConnectionData.value)).then(response => {
+    console.log(response)
+    if (!response){
+      notyf.error('Error saving connection');
+    } else {
+      notyf.success('Add connection');
+      fetchConnectionList()
+      openAddConnectionModal.value = false
     }
   })
 }
@@ -133,5 +151,18 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+  .hero {
+    .hero-body {
+      justify-content: center;
+      align-items: flex-start !important;
 
+      .table-wrapper{
+        min-width: 600px;
+
+        th {
+          text-align: center;
+        }
+      }
+    }
+  }
 </style>

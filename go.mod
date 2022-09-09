@@ -4,6 +4,7 @@ go 1.17
 
 require (
 	github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
+	go.etcd.io/bbolt v1.3.6
 	go.mongodb.org/mongo-driver v1.10.2
 )
 
@@ -25,6 +26,7 @@ require (
 	github.com/montanaflynn/stats v0.0.0-20171201202039-1bf9dbcd8cbe // indirect
 	github.com/pkg/browser v0.0.0-20210706143420-7d21f8c997e2 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tkrajina/go-reflector v0.5.5 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect

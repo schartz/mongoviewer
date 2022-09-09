@@ -1,0 +1,63 @@
+.button.is-primary.solid {
+  background-color: #5dbced;
+  box-shadow: inset 0 1px 0 0 #8acef2, inset 1px 0 0 0 #5cb5ec, inset -1px 0 0 0 #5cb5ec, inset 0 -1px 0 0 #5bb1eb;
+  text-shadow: 0 1px 0 #2395e5;
+  background-image: linear-gradient(#5dbced, #45a5e9);
+  border-color: #3c8dc6;
+  border-top-color: #4fa0ca;
+
+  &:active {
+    background-image: linear-gradient(to top, #5dbced, #45a5e9);
+    border-color: #3c8dc6;
+    border-top-color: #4fa0ca;
+    box-shadow: inset 0 1px 0 0 #8acef2, inset 1px 0 0 0 #5cb5ec, inset -1px 0 0 0 #5cb5ec, inset 0 -1px 0 0 #5bb1eb;
+  }
+}
+
+.button.is-danger.solid {
+  background-color: #e35d4f;
+  background-image: linear-gradient(#e35d4f, #c6262e);
+  border-color: #a92128;
+  border-top-color: #c14f43;
+  box-shadow: inset 0 1px 0 0 #eb8c83, inset 1px 0 0 0 #d74e4b, inset -1px 0 0 0 #d74e4b, inset 0 -1px 0 0 #ce4348;
+  text-shadow: 0 1px 0 #b22926;
+
+  &:active {
+    background-image: linear-gradient(to top, #e35d4f, #c6262e);
+    border-color: #a92128;
+    border-top-color: #c14f43;
+    box-shadow: inset 0 1px 0 0 #eb8c83, inset 1px 0 0 0 #d74e4b, inset -1px 0 0 0 #d74e4b, inset 0 -1px 0 0 #ce4348;
+  }
+}
+
+.button.is-dark.solid {
+  background-color: #3b3c3d;
+  background-image: linear-gradient(#3b3c3d, #2c2d2e);
+  border-color: #0f1011;
+  border-top-color: #18191a;
+  box-shadow: inset 0 1px 0 0 #454647, inset 1px 0 0 0 #363738, inset -1px 0 0 0 #363738, inset 0 -1px 0 0 #303132;
+  text-shadow: 0 1px 0 #222223;
+
+  &:active {
+    background-image: linear-gradient(to top, #3b3c3d, #2c2d2e);
+    border-color: #0f1011;
+    border-top-color: #18191a;
+    box-shadow: inset 0 1px 0 0 #454647, inset 1px 0 0 0 #363738, inset -1px 0 0 0 #363738, inset 0 -1px 0 0 #303132;
+  }
+}
+
+.button.is-warning.solid {
+  background-color: #f1b70e;
+  background-image: linear-gradient(#f1b70e, #af8408);
+  border-color: #8d6901;
+  border-top-color: #5e4702;
+  box-shadow: inset 0 1px 0 0 #454647, inset 1px 0 0 0 #363738, inset -1px 0 0 0 #363738, inset 0 -1px 0 0 #303132;
+  text-shadow: 0 1px 0 #222223;
+
+  &:active {
+    background-image: linear-gradient(to top, #3b3c3d, #2c2d2e);
+    border-color: #0f1011;
+    border-top-color: #18191a;
+    box-shadow: inset 0 1px 0 0 #454647, inset 1px 0 0 0 #363738, inset -1px 0 0 0 #363738, inset 0 -1px 0 0 #303132;
+  }
+}

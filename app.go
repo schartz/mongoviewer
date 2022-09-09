@@ -4,17 +4,16 @@ import (
 	"MongoViewer/connection"
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	bolt "go.etcd.io/bbolt"
 	"log"
 	"os"
-	"path"
-	"time"
 )
 
 // App struct
 type App struct {
-	ctx context.Context
+	ctx       context.Context
+	appDBPath string
+	appDB     *bolt.DB
 }
 
 // NewApp creates a new App application struct
@@ -25,17 +24,12 @@ func NewApp() *App {
 // startup is called at application startup
 func (a *App) startup(ctx context.Context) {
 	// Perform your setup here
-	a.ctx = ctx
-	cwd, err := os.Getwd()
-	if err != nil {
-		println(err)
-	}
-	myStr := `[{"conn": "Conn 1"}, {"conn": "conn 2"}]`
-	filename := path.Join(cwd, "mylist.json")
-	err1 := os.WriteFile(filename, []byte(myStr), 0600)
-	if err != nil {
-		println(err1)
-	}
+
+	log.SetFlags(log.Lshortfile)
+	log.SetPrefix("logger: ")
+
+	log.Println("running setup here")
+	a.setup(ctx)
 }
 
 // domReady is called after the front-end dom has been loaded
@@ -46,6 +40,57 @@ func (a App) domReady(ctx context.Context) {
 // shutdown is called at application termination
 func (a *App) shutdown(ctx context.Context) {
 	// Perform your teardown here
+	defer func(appDB *bolt.DB) {
+		err := appDB.Close()
+		if err != nil {
+
+		}
+	}(a.appDB)
+}
+
+func (a *App) setup(ctx context.Context) {
+	dirname, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	configDir := dirname + "/.mongoviewer"
+	appDBFile := configDir + "/app.db"
+
+	_, err1 := os.Stat(configDir)
+	if os.IsNotExist(err1) {
+		log.Println(configDir + " does not exist. Creating.")
+		errDir := os.MkdirAll(configDir, 0755)
+		if errDir != nil {
+			log.Fatal(err)
+		}
+
+		_, appDBErr := os.Stat(appDBFile)
+
+		if os.IsNotExist(appDBErr) {
+			log.Println(appDBFile + " does not exist. Creating.")
+			err2 := os.WriteFile(appDBFile, []byte(""), 0600)
+			if err2 != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+	a.appDBPath = appDBFile
+
+	a.appDB, err = bolt.Open(appDBFile, 0600, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	a.appDB.Update(func(tx *bolt.Tx) error {
+		_, err := tx.CreateBucketIfNotExists([]byte("Connections"))
+		if err != nil {
+			return fmt.Errorf("create bucket: %s", err)
+		}
+		log.Println("Added connections bucket into database")
+		return nil
+	})
+
 }
 
 // Greet returns a greeting for the given name
@@ -53,37 +98,17 @@ func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s!", name)
 }
 
-func (a *App) ConnectionList() string {
-	conns, err := connection.GetConnectionList()
+func (a *App) ConnectionList() []map[string]string {
+	connectionList, err := connection.GetConnectionList(a.appDB)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	}
-	return conns
+	return connectionList
 }
 
 func (a *App) TestConnection(connString string) string {
-	println(connString)
-	println("************************************")
-	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
-	if err != nil {
-		log.Println(err)
-		return err.Error()
-	}
-
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err2 := client.Connect(ctx)
-	if err2 != nil {
-		log.Println(err)
-		return err.Error()
-	}
-
-	msg := "yes"
-
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
-
-		}
-	}(client, ctx)
-	return msg
+	return connection.TestConnection(connString)
+}
+func (a *App) AddConnection(connString string) bool {
+	return connection.AddConnection(connString, a.appDB)
 }
