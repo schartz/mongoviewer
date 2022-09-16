@@ -5,10 +5,11 @@ import (
 	"context"
 	"fmt"
 	bolt "go.etcd.io/bbolt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
-	"time"
 )
 
 // App struct
@@ -116,30 +117,27 @@ func (a *App) AddConnection(connString string) bool {
 	return connection.AddConnection(connString, a.appDB)
 }
 
-func (a *App) ConnectToDB(connString string) map[string]int {
-	response := make(map[string]int)
-	mongoClient, err := connection.ConnectToDB(connString)
-	if err != nil {
-		response["status"] = 0
-		return response
-	}
-	a.mongoClient = mongoClient
-	response["status"] = 1
-	return response
-}
+func (a *App) ConnectToDBServer(connString string) []mongo.DatabaseSpecification {
 
-func (a *App) ListDBS() mongo.ListDatabasesResult {
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err := a.mongoClient.Connect(ctx)
+	ctx := context.TODO()
+	clientOptions := options.Client().ApplyURI(connString)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Println(err)
 	}
-	var m interface{}
-	dbList, err := a.mongoClient.ListDatabases(ctx, m)
+
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	a.mongoClient = client
+
+	filter := bson.D{}
+	dbList, err := a.mongoClient.ListDatabases(ctx, filter)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return dbList
+	return dbList.Databases
 
 }

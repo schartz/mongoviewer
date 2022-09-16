@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {onMounted, reactive} from 'vue'
-import {Greet, ListDBS} from '../../wailsjs/go/main/App'
 import {useRouter} from "vue-router";
 
 const router = useRouter()
@@ -16,7 +15,7 @@ async function go() {
 }
 
 onMounted(() => {
-  ListDBS().then(response => console.log(response)).catch(err => {console.error(err)})
+  //ListDBS().then(response => console.log(response)).catch(err => {console.error(err)})
 })
 
 </script>

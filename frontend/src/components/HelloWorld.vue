@@ -104,7 +104,7 @@
 import {onMounted, ref} from 'vue'
 import { Notyf } from 'notyf';
 import { useRouter } from 'vue-router';
-import {AddConnection, ConnectionList, ConnectToDB, TestConnection} from "../../wailsjs/go/main/App";
+import {AddConnection, ConnectionList, ConnectToDBServer, TestConnection} from "../../wailsjs/go/main/App";
 
 interface ConnectionData {
   name: string,
@@ -151,7 +151,8 @@ const addConnection = () => {
 }
 
 const connectToDB = (connection: ConnectionData) => {
-  ConnectToDB(connection.uri).then(async response => {
+  console.log('ji')
+  ConnectToDBServer(connection.uri).then(async response => {
     console.log(response)
 
   }).catch(err => {

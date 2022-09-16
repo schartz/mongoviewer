@@ -4,12 +4,10 @@ import {mongo} from '../models';
 
 export function AddConnection(arg1:string):Promise<boolean>;
 
-export function ConnectToDB(arg1:string):Promise<{[key: string]: number}>;
+export function ConnectToDBServer(arg1:string):Promise<Array<mongo.DatabaseSpecification>>;
 
 export function ConnectionList():Promise<Array<{[key: string]: string}>>;
 
 export function Greet(arg1:string):Promise<string>;
-
-export function ListDBS():Promise<mongo.ListDatabasesResult>;
 
 export function TestConnection(arg1:string):Promise<string>;

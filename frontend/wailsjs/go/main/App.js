@@ -6,8 +6,8 @@ export function AddConnection(arg1) {
   return window['go']['main']['App']['AddConnection'](arg1);
 }
 
-export function ConnectToDB(arg1) {
-  return window['go']['main']['App']['ConnectToDB'](arg1);
+export function ConnectToDBServer(arg1) {
+  return window['go']['main']['App']['ConnectToDBServer'](arg1);
 }
 
 export function ConnectionList() {
@@ -16,10 +16,6 @@ export function ConnectionList() {
 
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
-}
-
-export function ListDBS() {
-  return window['go']['main']['App']['ListDBS']();
 }
 
 export function TestConnection(arg1) {
