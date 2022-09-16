@@ -32,7 +32,7 @@
                 {{conn.uri}}
               </td>
               <td>
-                <button class="button is-link is-small">Connect</button>
+                <button class="button is-link is-small" @click="connectToDB(conn)">Connect</button>
               </td>
             </tr>
             </tbody>
@@ -44,9 +44,13 @@
 
         <p class="subtitle mt-6">
           <button class="button  is-warning" @click="openAddConnectionModal = true">
-             + Add a new connection
+            + Add a new connection
           </button>
         </p>
+
+        <button class="button  is-warning" @click="go">
+          go to internal
+        </button>
       </div>
     </div>
   </section>
@@ -88,7 +92,7 @@
         </div>
         <button class="modal-close is-large" aria-label="close" @click="openAddConnectionModal = false"></button>
       </div>
-      </div>
+    </div>
 
   </div>
 
@@ -99,21 +103,24 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import {onMounted, ref} from 'vue'
 import { Notyf } from 'notyf';
+import { useRouter } from 'vue-router';
+import {AddConnection, ConnectionList, ConnectToDB, TestConnection} from "../../wailsjs/go/main/App";
 
 interface ConnectionData {
   name: string,
   uri: string,
 }
 const notyf = new Notyf({duration: 5000, position:{x:'center',y:'top'}});
-const connectionList = ref([])
+const connectionList = ref<{ [key: string]: string; }[]>([])
 const openAddConnectionModal = ref(false)
+const router = useRouter();
 const newConnectionData = ref<ConnectionData>({
   name: 'default',
   uri: 'mongodb://localhost:27017'
 })
 
 const fetchConnectionList = () => {
-  window.go.main.App.ConnectionList().then(response => {
+  ConnectionList().then(response => {
     if (response && response.length > 0){
       connectionList.value = response
     }
@@ -121,7 +128,7 @@ const fetchConnectionList = () => {
 }
 
 const testConnection = () => {
-  window.go.main.App.TestConnection(newConnectionData.value.uri).then(response => {
+  TestConnection(newConnectionData.value.uri).then(response => {
     if (response !== 'yes'){
       notyf.error(response);
     } else {
@@ -131,7 +138,7 @@ const testConnection = () => {
 }
 
 const addConnection = () => {
-  window.go.main.App.AddConnection(JSON.stringify(newConnectionData.value)).then(response => {
+  AddConnection(JSON.stringify(newConnectionData.value)).then(response => {
     console.log(response)
     if (!response){
       notyf.error('Error saving connection');
@@ -143,26 +150,40 @@ const addConnection = () => {
   })
 }
 
+const connectToDB = (connection: ConnectionData) => {
+  ConnectToDB(connection.uri).then(async response => {
+    console.log(response)
+
+  }).catch(err => {
+    console.error(err)
+  })
+}
+
+const go = async () => {
+  await router.push({name: 'dblist'});
+}
+
 
 
 onMounted(() => {
   fetchConnectionList()
+  console.log(router)
 })
 </script>
 
 <style lang="scss">
-  .hero {
-    .hero-body {
-      justify-content: center;
-      align-items: flex-start !important;
+.hero {
+  .hero-body {
+    justify-content: center;
+    align-items: flex-start !important;
 
-      .table-wrapper{
-        min-width: 600px;
+    .table-wrapper{
+      min-width: 600px;
 
-        th {
-          text-align: center;
-        }
+      th {
+        text-align: center;
       }
     }
   }
+}
 </style>

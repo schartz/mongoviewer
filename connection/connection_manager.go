@@ -32,8 +32,6 @@ func GetConnectionList(db *bolt.DB) ([]map[string]string, error) {
 }
 
 func TestConnection(connString string) string {
-	println(connString)
-	println("************************************")
 	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
 	if err != nil {
 		log.Println(err)
@@ -81,4 +79,21 @@ func AddConnection(connString string, db *bolt.DB) bool {
 		return false
 	}
 	return true
+}
+
+func ConnectToDB(uriString string) (*mongo.Client, error) {
+	client, err := mongo.NewClient(options.Client().ApplyURI(uriString))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	err = client.Connect(ctx)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return client, nil
+
 }

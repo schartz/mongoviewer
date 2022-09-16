@@ -1,31 +1,26 @@
-<template>
-  <Home />
-</template>
+<script lang="ts" setup>
 
-<script setup lang="ts">
-// This template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
-import Home from './components/Home.vue'
 </script>
 
+<template>
+
+  <router-view v-slot="{ Component }">
+    <keep-alive>
+      <component :is="Component" />
+    </keep-alive>
+  </router-view>
+</template>
+
 <style>
-@font-face {
-  font-family: "Nunito";
-  font-style: normal;
-  font-weight: 400;
-  src: local(""),
-  url("assets/fonts/nunito-v16-latin-regular.woff2") format("woff2");
-}
-
-html {
-  background-color: rgba(33, 37, 43, 1);
-  color: white;
-  font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-  "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-  sans-serif;
-}
-
-body {
-  margin: 0;
+#logo {
+  display: block;
+  width: 50%;
+  height: 50%;
+  margin: auto;
+  padding: 10% 0 0;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-origin: content-box;
 }
 </style>
