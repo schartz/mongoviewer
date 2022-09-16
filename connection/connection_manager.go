@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	bolt "go.etcd.io/bbolt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -81,19 +82,24 @@ func AddConnection(connString string, db *bolt.DB) bool {
 	return true
 }
 
-func ConnectToDB(uriString string) (*mongo.Client, error) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(uriString))
+func ConnectToDBServer(uriString string, appMongoClientHandle *mongo.Client) []mongo.DatabaseSpecification {
+	ctx := context.TODO()
+	clientOptions := options.Client().ApplyURI(uriString)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Println(err)
-		return nil, err
 	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err = client.Connect(ctx)
+
+	err = client.Ping(ctx, nil)
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		log.Fatal(err)
 	}
+	appMongoClientHandle = client
 
-	return client, nil
-
+	filter := bson.D{}
+	dbList, err := appMongoClientHandle.ListDatabases(ctx, filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return dbList.Databases
 }

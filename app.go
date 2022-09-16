@@ -5,9 +5,7 @@ import (
 	"context"
 	"fmt"
 	bolt "go.etcd.io/bbolt"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 )
@@ -118,26 +116,6 @@ func (a *App) AddConnection(connString string) bool {
 }
 
 func (a *App) ConnectToDBServer(connString string) []mongo.DatabaseSpecification {
-
-	ctx := context.TODO()
-	clientOptions := options.Client().ApplyURI(connString)
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Println(err)
-	}
-
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	a.mongoClient = client
-
-	filter := bson.D{}
-	dbList, err := a.mongoClient.ListDatabases(ctx, filter)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return dbList.Databases
+	return connection.ConnectToDBServer(connString, a.mongoClient)
 
 }
