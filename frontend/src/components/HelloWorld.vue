@@ -105,11 +105,11 @@ import {onMounted, ref} from 'vue'
 import { Notyf } from 'notyf';
 import { useRouter } from 'vue-router';
 import {AddConnection, ConnectionList, ConnectToDBServer, TestConnection} from "../../wailsjs/go/main/App";
+import {databaseListStore} from "/@src/stores/databaseList";
+import {currentConnectionStore} from "/@src/stores/currentConnectionStore";
 
-interface ConnectionData {
-  name: string,
-  uri: string,
-}
+const dbStore = databaseListStore()
+const activeConnectionStore = currentConnectionStore()
 const notyf = new Notyf({duration: 5000, position:{x:'center',y:'top'}});
 const connectionList = ref<{ [key: string]: string; }[]>([])
 const openAddConnectionModal = ref(false)
@@ -151,9 +151,10 @@ const addConnection = () => {
 }
 
 const connectToDB = (connection: ConnectionData) => {
-  console.log('ji')
   ConnectToDBServer(connection.uri).then(async response => {
     console.log(response)
+    activeConnectionStore.updateActiveConnection(connection)
+    dbStore.updateList(response)
 
   }).catch(err => {
     console.error(err)

@@ -1,76 +1,51 @@
 <script lang="ts" setup>
-import {onMounted, reactive} from 'vue'
+import {onMounted, reactive, ref} from 'vue'
 import {useRouter} from "vue-router";
+import {databaseListStore} from "/@src/stores/databaseList";
+import {currentConnectionStore} from "/@src/stores/currentConnectionStore";
+import DatabaseDetails from "/@src/components/Dashboard/DatabaseDetails.vue";
 
+const dbListStore = databaseListStore()
+const activeConnectionStore = currentConnectionStore()
 const router = useRouter()
-const data = reactive({
-  name: "",
-  resultText: "Please enter your name below 👇",
-})
+const dbList = ref<Array<DbInfo>>([])
+const activeConnection = ref<ConnectionData>()
 
 
-
-async function go() {
-  await router.push('/')
+const init = async() => {
+  dbList.value = dbListStore.getList()
+  activeConnection.value = activeConnectionStore.getActiveConnection()
 }
 
-onMounted(() => {
-  //ListDBS().then(response => console.log(response)).catch(err => {console.error(err)})
+onMounted(async () => {
+  await init()
 })
 
 </script>
 
 <template>
-  <main>
-    <h1>
-      I am tototo
-    </h1>
-    <button class="btn" @click="go">Go to HOme</button>
 
-  </main>
+  <div class="columns">
+    <div class="column is-3 menu-container">
+      <aside class="menu p-5">
+        <p class="menu-label">
+          Databases in <i>{{activeConnection?.name}}</i>
+        </p>
+        <ul class="menu-list">
+          <li v-for="db in dbList">
+            <a>{{db.Name}}</a>
+          </li>
+        </ul>
+      </aside>
+    </div>
+    <div class="column">
+      <database-details></database-details>
+    </div>
+  </div>
 </template>
 
-<style scoped>
-.result {
-  height: 20px;
-  line-height: 20px;
-  margin: 1.5rem auto;
-}
-
-.input-box .btn {
-  width: 60px;
-  height: 30px;
-  line-height: 30px;
-  border-radius: 3px;
-  border: none;
-  margin: 0 0 0 20px;
-  padding: 0 8px;
-  cursor: pointer;
-}
-
-.input-box .btn:hover {
-  background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-  color: #333333;
-}
-
-.input-box .input {
-  border: none;
-  border-radius: 3px;
-  outline: none;
-  height: 30px;
-  line-height: 30px;
-  padding: 0 10px;
-  background-color: rgba(240, 240, 240, 1);
-  -webkit-font-smoothing: antialiased;
-}
-
-.input-box .input:hover {
-  border: none;
-  background-color: rgba(255, 255, 255, 1);
-}
-
-.input-box .input:focus {
-  border: none;
-  background-color: rgba(255, 255, 255, 1);
+<style scoped lang="scss">
+.menu-container {
+  border-right: 2px solid black;
 }
 </style>

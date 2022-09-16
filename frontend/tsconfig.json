@@ -15,12 +15,9 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "lib": ["esnext", "dom"],
-//    "types": [
-//      "vite/client",
-//      "vite-plugin-pwa/client",
-//      "vite-plugin-pages/client",
-//      "@intlify/vite-plugin-vue-i18n/client"
-//    ],
+    "types": [
+
+    ],
     "paths": {
       "/~/*": ["./src/assets/*"],
       "/@src/*": ["./src/*"]
