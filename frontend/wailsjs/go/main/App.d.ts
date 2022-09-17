@@ -8,6 +8,8 @@ export function ConnectToDBServer(arg1:string):Promise<Array<mongo.DatabaseSpeci
 
 export function ConnectionList():Promise<Array<{[key: string]: string}>>;
 
+export function GetDBDetails(arg1:string):Promise<{[key: string]: any}>;
+
 export function Greet(arg1:string):Promise<string>;
 
 export function TestConnection(arg1:string):Promise<string>;

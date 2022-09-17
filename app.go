@@ -1,12 +1,13 @@
 package main
 
 import (
+	"MongoViewer/app_logging"
 	"MongoViewer/connection"
 	"context"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	bolt "go.etcd.io/bbolt"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"os"
 )
 
@@ -18,6 +19,8 @@ type App struct {
 	mongoClient *mongo.Client
 }
 
+var appLogger *logrus.Logger
+
 // NewApp creates a new App application struct
 func NewApp() *App {
 	return &App{}
@@ -26,12 +29,9 @@ func NewApp() *App {
 // startup is called at application startup
 func (a *App) startup(ctx context.Context) {
 	// Perform your setup here
-
-	log.SetFlags(log.Lshortfile)
-	log.SetPrefix("logger: ")
-
-	log.Println("running setup here")
+	appLogger = app_logging.GetLogger()
 	a.setup(ctx)
+	appLogger.Println("Setup complete")
 }
 
 // domReady is called after the front-end dom has been loaded
@@ -53,7 +53,7 @@ func (a *App) shutdown(ctx context.Context) {
 func (a *App) setup(ctx context.Context) {
 	dirname, err := os.UserHomeDir()
 	if err != nil {
-		log.Fatal(err)
+		appLogger.Fatal(err)
 	}
 
 	configDir := dirname + "/.mongoviewer"
@@ -61,19 +61,19 @@ func (a *App) setup(ctx context.Context) {
 
 	_, err1 := os.Stat(configDir)
 	if os.IsNotExist(err1) {
-		log.Println(configDir + " does not exist. Creating.")
+		appLogger.Println(configDir + " does not exist. Creating.")
 		errDir := os.MkdirAll(configDir, 0755)
 		if errDir != nil {
-			log.Fatal(err)
+			appLogger.Fatal(err)
 		}
 
 		_, appDBErr := os.Stat(appDBFile)
 
 		if os.IsNotExist(appDBErr) {
-			log.Println(appDBFile + " does not exist. Creating.")
+			appLogger.Println(appDBFile + " does not exist. Creating.")
 			err2 := os.WriteFile(appDBFile, []byte(""), 0600)
 			if err2 != nil {
-				log.Fatal(err)
+				appLogger.Fatal(err)
 			}
 		}
 	}
@@ -81,7 +81,7 @@ func (a *App) setup(ctx context.Context) {
 
 	a.appDB, err = bolt.Open(appDBFile, 0600, nil)
 	if err != nil {
-		log.Fatal(err)
+		appLogger.Fatal(err)
 	}
 
 	a.appDB.Update(func(tx *bolt.Tx) error {
@@ -89,7 +89,7 @@ func (a *App) setup(ctx context.Context) {
 		if err != nil {
 			return fmt.Errorf("create bucket: %s", err)
 		}
-		log.Println("Added connections bucket into database")
+		appLogger.Println("Added connections bucket into database")
 		return nil
 	})
 
@@ -103,7 +103,7 @@ func (a *App) Greet(name string) string {
 func (a *App) ConnectionList() []map[string]string {
 	connectionList, err := connection.GetConnectionList(a.appDB)
 	if err != nil {
-		log.Println(err)
+		appLogger.Println(err)
 	}
 	return connectionList
 }
@@ -116,6 +116,9 @@ func (a *App) AddConnection(connString string) bool {
 }
 
 func (a *App) ConnectToDBServer(connString string) []mongo.DatabaseSpecification {
-	return connection.ConnectToDBServer(connString, a.mongoClient)
+	return connection.ConnectToDBServer(connString)
+}
 
+func (a *App) GetDBDetails(dbName string) map[string]interface{} {
+	return connection.GetDBDetails(dbName)
 }

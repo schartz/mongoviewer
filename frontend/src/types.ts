@@ -12,8 +12,13 @@ interface DbInfo {
 interface ActiveDatabase {
     name: string,
     collections: Array<string>,
-    functions: Array<string>,
+    functions: Array<DBFunction>,
     users: Array<string>
+}
+
+interface DBFunction {
+    _id: string
+    value: string
 }
 
 interface ConnectionListTreeRoot {

@@ -3,10 +3,10 @@ import {useLocalStorage} from "@vueuse/core";
 
 export const activeDBStore  = defineStore('activeDBSTore', () => {
     const activeDB = useLocalStorage<ActiveDatabase>('activeDatabase', {
-        name: "some database",
-        collections: ["coll1", "coll2"],
-        functions: ["func1", "func2"],
-        users: ["user1", "user2"]
+        name: "No database selected",
+        collections: [],
+        functions: [],
+        users: []
     })
 
     const updateActiveDB = (dbData: ActiveDatabase) => {
@@ -17,5 +17,5 @@ export const activeDBStore  = defineStore('activeDBSTore', () => {
         return activeDB.value
     }
 
-    return {updateActiveDB, getActiveDB} as const
+    return {activeDB, updateActiveDB, getActiveDB}
 })

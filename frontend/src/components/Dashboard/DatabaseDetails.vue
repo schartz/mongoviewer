@@ -29,18 +29,30 @@ onMounted(async() => {
         <a v-on:click="activeTab = 'Functions'">Functions ({{activeDatabase?.functions.length}})</a>
       </li>
       <li v-bind:class="{ 'is-active': activeTab === 'Users' }">
-        <a v-on:click="activeTab = 'Users'">Users ({{activeDatabase?.users.length}})</a>
+        <a v-on:click="activeTab = 'Users'">Users ({{activeDatabase?.users?.length}})</a>
       </li>
     </ul>
   </div>
   <div class="tab-contents">
     <div v-if="activeTab === 'Collections'" class="content">
-      <p v-for="coll in activeDatabase?.collections">
-        {{coll}} <button class="button is-small is-link">Open</button>
-      </p>
+      <div v-for="coll in activeDatabase?.collections" class="columns collection-row">
+        <div class="column is-10">
+          {{coll}}
+        </div>
+        <div class="column">
+          <span class="tag is-primary">Open</span>
+        </div>
+      </div>
     </div>
     <div v-if="activeTab === 'Functions'" class="content" >
-      Functions content
+      <div v-for="fn in activeDatabase?.functions" class="columns collection-row">
+        <div class="column">
+          {{fn._id}}
+        </div>
+        <div class="column">
+          {{fn.value}}
+        </div>
+      </div>
     </div>
     <div v-if="activeTab === 'Users'" class="content">
       Users content
@@ -48,6 +60,23 @@ onMounted(async() => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
+@import "/@src/scss/theme/_variables.scss";
+.tab-contents {
+  .content {
+    padding:1rem
+  }
+}
+.collection-row {
+  &:hover {
+    background: $simple-bg-hover;
+  }
 
+  span.tag {
+    cursor:pointer;
+    &:hover {
+      background: #20344a;
+    }
+  }
+}
 </style>

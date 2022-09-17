@@ -4,17 +4,41 @@ import {useRouter} from "vue-router";
 import {databaseListStore} from "/@src/stores/databaseList";
 import {currentConnectionStore} from "/@src/stores/currentConnectionStore";
 import DatabaseDetails from "/@src/components/Dashboard/DatabaseDetails.vue";
+import {GetDBDetails} from "../../wailsjs/go/main/App";
+import {activeDBStore} from "/@src/stores/activeDBStore";
 
-const dbListStore = databaseListStore()
-const activeConnectionStore = currentConnectionStore()
+const storeDBList = databaseListStore()
+const storeActiveConnection = currentConnectionStore()
+const storeActiveDb = activeDBStore()
+
+const activeDbName = ref<string>()
 const router = useRouter()
 const dbList = ref<Array<DbInfo>>([])
 const activeConnection = ref<ConnectionData>()
 
+const isReady = ref<boolean>(false)
+
+
+const selectDb = async(dbName: string) => {
+  isReady.value = false
+  GetDBDetails(dbName).then(response => {
+    activeDbName.value = dbName
+    storeActiveDb.updateActiveDB({
+      name: dbName,
+      collections: response.collections,
+      functions: response.dbFunctions,
+      users: response.users || []
+    })
+    isReady.value = true
+  }).catch(err => {
+    console.error(err)
+  })
+}
+
 
 const init = async() => {
-  dbList.value = dbListStore.getList()
-  activeConnection.value = activeConnectionStore.getActiveConnection()
+  dbList.value = storeDBList.getList()
+  activeConnection.value = storeActiveConnection.getActiveConnection()
 }
 
 onMounted(async () => {
@@ -32,20 +56,25 @@ onMounted(async () => {
           Databases in <i>{{activeConnection?.name}}</i>
         </p>
         <ul class="menu-list">
-          <li v-for="db in dbList">
-            <a>{{db.Name}}</a>
+          <li v-for="db in dbList" :class="{'is-active': activeDbName === db.Name}">
+            <a @click="selectDb(db.Name)">{{db.Name}}</a>
           </li>
         </ul>
       </aside>
     </div>
     <div class="column">
-      <database-details></database-details>
+      <database-details v-if="isReady"></database-details>
+
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+@import "/@src/scss/theme/_variables.scss";
 .menu-container {
   border-right: 2px solid black;
+}
+li.is-active, li.is-active:hover {
+  background-color: $primary;
 }
 </style>

@@ -47,10 +47,6 @@
             + Add a new connection
           </button>
         </p>
-
-        <button class="button  is-warning" @click="go">
-          go to internal
-        </button>
       </div>
     </div>
   </section>
@@ -155,14 +151,11 @@ const connectToDB = (connection: ConnectionData) => {
     console.log(response)
     activeConnectionStore.updateActiveConnection(connection)
     dbStore.updateList(response)
+    await router.push({name: 'dblist'});
 
   }).catch(err => {
     console.error(err)
   })
-}
-
-const go = async () => {
-  await router.push({name: 'dblist'});
 }
 
 

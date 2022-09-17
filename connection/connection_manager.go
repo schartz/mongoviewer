@@ -2,47 +2,83 @@ package connection
 
 import (
 	"context"
-	"encoding/json"
-	bolt "go.etcd.io/bbolt"
-	"go.mongodb.org/mongo-driver/bson"
+	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
+	"sync"
 	"time"
 )
 
-func GetConnectionList(db *bolt.DB) ([]map[string]string, error) {
-	var connectionList []map[string]string
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte("Connections"))
-		cursor := b.Cursor()
-		for key, value := cursor.First(); key != nil; key, value = cursor.Next() {
+type MongoSession struct {
+	db     *mongo.Database
+	Client *mongo.Client
+	logger *logrus.Logger
+}
 
-			connectionList = append(connectionList, map[string]string{"name": string(key), "uri": string(value)})
+var MONGOSSN *MongoSession
 
+func InitMongoSession(uri string, logger *logrus.Logger) {
+
+	session := connect(uri, logger)
+	if session != nil {
+
+		// log statements here as well
+
+		mongoSession := new(MongoSession)
+		mongoSession.db = nil
+		mongoSession.logger = logger
+		mongoSession.Client = session
+		MONGOSSN = mongoSession
+		return
+	}
+	logger.Fatalf("Failed to connect to mongo server: %v", uri)
+}
+
+func connect(uri string, logger *logrus.Logger) *mongo.Client {
+	var connectOnce sync.Once
+	var client *mongo.Client
+	connectOnce.Do(func() {
+
+		var err error
+		client, err = mongo.NewClient(options.Client().ApplyURI(uri))
+		if err != nil {
+			logger.Fatal(err)
 		}
-		return nil
+		err = client.Connect(context.TODO())
+		if err != nil {
+			logger.Fatal(err)
+		}
 	})
 
-	if err != nil {
-		return nil, err
+	return client
+}
+
+func (mongoSession *MongoSession) SelectDatabase(dbName string, logger *logrus.Logger) {
+	if mongoSession.Client == nil {
+		logger.Fatal("Cannot select database in an uninitialized session")
 	}
 
-	return connectionList, nil
+	err := mongoSession.Client.Connect(context.TODO())
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	mongoSession.db = mongoSession.Client.Database(dbName)
+	logger.Info("Successfully connected to database: %v", dbName)
 
 }
 
 func TestConnection(connString string) string {
 	client, err := mongo.NewClient(options.Client().ApplyURI(connString))
 	if err != nil {
-		log.Println(err)
+		appLogger.Println(err)
 		return err.Error()
 	}
 
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	err2 := client.Connect(ctx)
 	if err2 != nil {
-		log.Println(err)
+		appLogger.Println(err)
 		return err.Error()
 	}
 
@@ -55,51 +91,4 @@ func TestConnection(connString string) string {
 		}
 	}(client, ctx)
 	return msg
-}
-
-func AddConnection(connString string, db *bolt.DB) bool {
-	var connection map[string]string
-	err := json.Unmarshal([]byte(connString), &connection)
-	if err != nil {
-		return false
-	}
-
-	err = db.Update(func(tx *bolt.Tx) error {
-		b, err := tx.CreateBucketIfNotExists([]byte("Connections"))
-		if err != nil {
-			return err
-		}
-
-		if err := b.Put([]byte(connection["name"]), []byte(connection["uri"])); err != nil {
-			log.Fatal(err)
-		}
-
-		return nil
-	})
-	if err != nil {
-		return false
-	}
-	return true
-}
-
-func ConnectToDBServer(uriString string, appMongoClientHandle *mongo.Client) []mongo.DatabaseSpecification {
-	ctx := context.TODO()
-	clientOptions := options.Client().ApplyURI(uriString)
-	client, err := mongo.Connect(ctx, clientOptions)
-	if err != nil {
-		log.Println(err)
-	}
-
-	err = client.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	appMongoClientHandle = client
-
-	filter := bson.D{}
-	dbList, err := appMongoClientHandle.ListDatabases(ctx, filter)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return dbList.Databases
 }
