@@ -13,7 +13,7 @@ interface ActiveDatabase {
     name: string,
     collections: Array<string>,
     functions: Array<DBFunction>,
-    users: Array<string>
+    users: any
 }
 
 interface DBFunction {

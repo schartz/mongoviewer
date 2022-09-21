@@ -8,3 +8,4 @@ declare module '*.vue' {
 }
 
 declare module 'vuejs-tree';
+declare module 'splitpanes';
