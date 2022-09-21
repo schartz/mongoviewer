@@ -23,13 +23,13 @@ onMounted(async() => {
   <div class="tabs is-centered">
     <ul>
       <li v-bind:class="{ 'is-active': activeTab === 'Collections' }">
-        <a v-on:click="activeTab = 'Collections'">Collections ({{activeDatabase?.collections.length}})</a>
+        <a v-on:click="activeTab = 'Collections'">Collections ({{activeDatabase?.collections?.length || 0}})</a>
       </li>
       <li v-bind:class="{ 'is-active': activeTab === 'Functions' }">
-        <a v-on:click="activeTab = 'Functions'">Functions ({{activeDatabase?.functions.length}})</a>
+        <a v-on:click="activeTab = 'Functions'">Functions ({{activeDatabase?.functions?.length || 0}})</a>
       </li>
       <li v-bind:class="{ 'is-active': activeTab === 'Users' }">
-        <a v-on:click="activeTab = 'Users'">Users ({{activeDatabase?.users?.length}})</a>
+        <a v-on:click="activeTab = 'Users'">Users ({{activeDatabase?.users.users?.length || 0}})</a>
       </li>
     </ul>
   </div>
@@ -60,7 +60,50 @@ onMounted(async() => {
       </div>
     </div>
     <div v-if="activeTab === 'Users'" class="content">
-      Users content
+
+      <div v-for="userObj in activeDatabase?.users.users" class="box">
+        <div class="columns collection-row">
+          <div class="column">
+            _id
+          </div>
+          <div class="column">
+          <span style="font-family: 'monospace'">
+            {{userObj._id}}
+          </span>
+          </div>
+        </div>
+        <div class="columns collection-row">
+          <div class="column">
+            username
+          </div>
+          <div class="column">
+          <span style="font-family: 'monospace'">
+            {{userObj.user}}
+          </span>
+          </div>
+        </div>
+        <div class="columns collection-row">
+          <div class="column">
+            roles
+          </div>
+          <div class="column">
+          <span style="font-family: 'monospace'">
+            {{userObj.roles}}
+          </span>
+          </div>
+        </div>
+        <div class="columns collection-row">
+          <div class="column">
+            mechanisms
+          </div>
+          <div class="column">
+          <span style="font-family: 'monospace'">
+            {{userObj.mechanisms}}
+          </span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>

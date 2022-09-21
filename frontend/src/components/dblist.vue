@@ -23,6 +23,8 @@ const selectDb = async(dbName: string) => {
   isReady.value = false
   GetDBDetails(dbName).then(response => {
     activeDbName.value = dbName
+    console.log('*********')
+    console.log(response)
     storeActiveDb.updateActiveDB({
       name: dbName,
       collections: response.collections,
