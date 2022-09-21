@@ -3,8 +3,7 @@ package connection
 import (
 	"MongoViewer/app_logging"
 	"context"
-	"encoding/json"
-	"fmt"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,6 +14,13 @@ var appLogger = app_logging.GetLogger()
 type dbFunctions struct {
 	_id   string
 	value string
+}
+
+type dbUser struct {
+	_id        string
+	userId     uuid.UUID
+	db         string
+	mechanisms []string
 }
 
 func ConnectToDBServer(uriString string) []mongo.DatabaseSpecification {
@@ -29,12 +35,13 @@ func ConnectToDBServer(uriString string) []mongo.DatabaseSpecification {
 
 func GetDBDetails(dbName string) map[string]interface{} {
 	collections := listCollections(dbName)
-	listUser(dbName)
+	users := listUser(dbName)
 	dbFunctionList := listFunctions(dbName)
 
 	response := map[string]interface{}{
 		"dbFunctions": dbFunctionList,
 		"collections": collections,
+		"users":       users,
 	}
 	return response
 }
@@ -55,7 +62,7 @@ func listCollections(dbName string) []string {
 	return result
 }
 
-func listUser(dbName string) {
+func listUser(dbName string) bson.M {
 	command := bson.D{
 		{"usersInfo", 1},
 		{"filter", bson.D{}},
@@ -64,15 +71,15 @@ func listUser(dbName string) {
 	if result.Err() != nil {
 		appLogger.Error(result.Err())
 	}
-	println("++++++")
-	response, err := json.MarshalIndent(result, "", "    ")
+	var a bson.M
+	err := result.Decode(&a)
 	if err != nil {
 		appLogger.Error(err)
 	}
-	fmt.Printf("%s\n", response)
+	return a
 }
 
-func listFunctions(dbName string) []dbFunctions {
+func listFunctions(dbName string) []bson.D {
 	// get list of functions
 	functionsCollection := MONGOSSN.Client.Database(dbName).Collection("system.js")
 	cursor, err := functionsCollection.Find(context.TODO(), bson.D{})
@@ -80,9 +87,9 @@ func listFunctions(dbName string) []dbFunctions {
 		appLogger.Error(err)
 	}
 
-	var result []dbFunctions
+	var result []bson.D
 	for cursor.Next(context.TODO()) {
-		var a dbFunctions
+		var a bson.D
 		err = cursor.Decode(&a)
 		if err != nil {
 			appLogger.Error(err)
@@ -90,6 +97,5 @@ func listFunctions(dbName string) []dbFunctions {
 
 		result = append(result, a)
 	}
-
 	return result
 }

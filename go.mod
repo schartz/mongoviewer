@@ -3,6 +3,7 @@ module MongoViewer
 go 1.17
 
 require (
+	github.com/google/uuid v1.1.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/wailsapp/wails/v2 v2.0.0-beta.44.2
 	go.etcd.io/bbolt v1.3.6
@@ -13,7 +14,6 @@ require (
 	github.com/bep/debounce v1.2.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/golang/snappy v0.0.1 // indirect
-	github.com/google/uuid v1.1.2 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jchv/go-winloader v0.0.0-20210711035445-715c2860da7e // indirect
 	github.com/klauspost/compress v1.13.6 // indirect

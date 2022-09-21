@@ -46,11 +46,16 @@ onMounted(async() => {
     </div>
     <div v-if="activeTab === 'Functions'" class="content" >
       <div v-for="fn in activeDatabase?.functions" class="columns collection-row">
-        <div class="column">
-          {{fn._id}}
+        <div class="column is-2">
+          {{fn[0]['Value']}}
         </div>
-        <div class="column">
-          {{fn.value}}
+        <div class="column has-text-centered">
+          <span style="font-family: 'monospace'">
+            {{fn[1]['Value']}}
+          </span>
+        </div>
+        <div class="column is-1">
+          <span class="tag is-warning">Edit</span>
         </div>
       </div>
     </div>
