@@ -5,9 +5,15 @@ import {activeDBStore} from "/@src/stores/activeDBStore";
 const activeDatabaseStore = activeDBStore()
 const activeTab = ref<string>('Collections')
 const activeDatabase = ref<ActiveDatabase>()
+const selectedCollection = ref("")
+const isCollectionViewOpen = ref<boolean>(false)
 
 const init = async() => {
   activeDatabase.value = activeDatabaseStore.getActiveDB()
+}
+
+const openCollection = (collectionsName: string) => {
+  selectedCollection.value = collectionsName
 }
 
 onMounted(async() => {
@@ -35,12 +41,23 @@ onMounted(async() => {
   </div>
   <div class="tab-contents">
     <div v-if="activeTab === 'Collections'" class="content">
-      <div v-for="coll in activeDatabase?.collections" class="columns collection-row">
-        <div class="column is-10">
-          {{coll}}
+      <div v-if="selectedCollection !== ''">
+        <div class="select is-fullwidth">
+          <select v-model="selectedCollection">
+            <option value="">Select a collection to open</option>
+            <option v-bind:value="coll" v-for="coll in activeDatabase?.collections">{{coll}}</option>
+          </select>
         </div>
-        <div class="column">
-          <span class="tag is-primary">Open</span>
+        <hr class="divider">
+      </div>
+      <div v-else>
+        <div v-for="coll in activeDatabase?.collections" class="columns collection-row">
+          <div class="column is-10">
+            {{coll}}
+          </div>
+          <div class="column">
+            <span class="tag is-primary" @click="openCollection(coll)">Open</span>
+          </div>
         </div>
       </div>
     </div>
