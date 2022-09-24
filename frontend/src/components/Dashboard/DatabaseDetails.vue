@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref} from "vue";
-import {activeDBStore} from "/@src/stores/activeDBStore";
+import {onMounted, ref, shallowRef} from "vue";
+import {useActiveDBStore} from "/@src/stores/useActiveDBStore";
+import CollectionDetails from "/@src/components/partials/CollectionDetails.vue";
+import {useOpenCollectionStore} from "/@src/stores/openMongoCollection";
 
-const activeDatabaseStore = activeDBStore()
+
+
+const activeDatabaseStore = useActiveDBStore()
 const activeTab = ref<string>('Collections')
 const activeDatabase = ref<ActiveDatabase>()
 const selectedCollection = ref("")
-const isCollectionViewOpen = ref<boolean>(false)
+const openCollectionStore = useOpenCollectionStore()
 
 const init = async() => {
   activeDatabase.value = activeDatabaseStore.getActiveDB()
@@ -14,6 +18,7 @@ const init = async() => {
 
 const openCollection = (collectionsName: string) => {
   selectedCollection.value = collectionsName
+  openCollectionStore.updateName(collectionsName)
 }
 
 onMounted(async() => {
@@ -23,9 +28,6 @@ onMounted(async() => {
 </script>
 
 <template>
-  <h1 class="has-text-centered mb-5 mt-4 is-size-5" style="background: #1d2122">
-    Active Database : {{activeDatabase?.name}}
-  </h1>
   <div class="tabs is-centered">
     <ul>
       <li v-bind:class="{ 'is-active': activeTab === 'Collections' }">
@@ -49,6 +51,7 @@ onMounted(async() => {
           </select>
         </div>
         <hr class="divider">
+        <collection-details></collection-details>
       </div>
       <div v-else>
         <div v-for="coll in activeDatabase?.collections" class="columns collection-row">

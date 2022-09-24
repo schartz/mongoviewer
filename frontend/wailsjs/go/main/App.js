@@ -14,6 +14,10 @@ export function ConnectionList() {
   return window['go']['main']['App']['ConnectionList']();
 }
 
+export function GetCollectionItems(arg1, arg2) {
+  return window['go']['main']['App']['GetCollectionItems'](arg1, arg2);
+}
+
 export function GetDBDetails(arg1) {
   return window['go']['main']['App']['GetDBDetails'](arg1);
 }

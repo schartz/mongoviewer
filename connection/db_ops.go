@@ -3,10 +3,13 @@ package connection
 import (
 	"MongoViewer/app_logging"
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"reflect"
 )
 
 var appLogger = app_logging.GetLogger()
@@ -45,6 +48,42 @@ func GetDBDetails(dbName string) map[string]interface{} {
 	}
 	return response
 }
+
+func RunQuery(collectionName string, queryString string) []bson.D {
+	query := buildQuery(queryString)
+	collection := MONGOSSN.db.Collection(collectionName)
+	cursor, err := collection.Find(context.TODO(), query)
+	if err != nil {
+		appLogger.Error(err)
+	}
+	var result []bson.D
+	for cursor.Next(context.TODO()) {
+		var a bson.D
+		err = cursor.Decode(&a)
+		if err != nil {
+			appLogger.Error(err)
+		}
+
+		result = append(result, a)
+	}
+	return result
+
+}
+
+func buildQuery(queryString string) bson.M {
+	var bsonMap bson.M
+	err := json.Unmarshal([]byte(queryString), &bsonMap)
+	if err != nil {
+		appLogger.Error("json. Unmarshal() ERROR")
+		appLogger.Error(err)
+	} else {
+		fmt.Println("bsonMap:", bsonMap)
+		fmt.Println("bsonMap TYPE:", reflect.TypeOf(bsonMap))
+		fmt.Println("BSON:", reflect.TypeOf(bson.M{"int field": bson.M{"$gt": 42}}))
+	}
+	return bsonMap
+}
+
 func listCollections(dbName string) []string {
 	// get list of collections
 	ctx := context.TODO()

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/sirupsen/logrus"
 	bolt "go.etcd.io/bbolt"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
 )
@@ -121,4 +122,8 @@ func (a *App) ConnectToDBServer(connString string) []mongo.DatabaseSpecification
 
 func (a *App) GetDBDetails(dbName string) map[string]interface{} {
 	return connection.GetDBDetails(dbName)
+}
+
+func (a *App) GetCollectionItems(collectionName string, queryString string) []bson.D {
+	return connection.RunQuery(collectionName, queryString)
 }

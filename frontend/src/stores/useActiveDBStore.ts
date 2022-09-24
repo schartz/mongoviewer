@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {useLocalStorage} from "@vueuse/core";
 
-export const activeDBStore  = defineStore('activeDBSTore', () => {
+export const useActiveDBStore  = defineStore('activeDBSTore', () => {
     const activeDB = useLocalStorage<ActiveDatabase>('activeDatabase', {
         name: "No database selected",
         collections: [],

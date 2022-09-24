@@ -1,7 +1,7 @@
 import {defineStore} from "pinia";
 import {useLocalStorage} from "@vueuse/core";
 
-export const currentConnectionStore  = defineStore('currentConnection', () => {
+export const useCurrentConnectionStore  = defineStore('currentConnection', () => {
     const activeConnection = useLocalStorage<ConnectionData>('activeConnection', {
         name: "default",
         uri: "mongodb://localhost:27017"

@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import {onMounted, reactive, ref} from 'vue'
 import {useRouter} from "vue-router";
-import {databaseListStore} from "/@src/stores/databaseList";
-import {currentConnectionStore} from "/@src/stores/currentConnectionStore";
+import {useDatabaseListStore} from "/@src/stores/databaseList";
+import {useCurrentConnectionStore} from "/@src/stores/useCurrentConnectionStore";
 import DatabaseDetails from "/@src/components/Dashboard/DatabaseDetails.vue";
 import {GetDBDetails} from "../../wailsjs/go/main/App";
-import {activeDBStore} from "/@src/stores/activeDBStore";
+import {useActiveDBStore} from "/@src/stores/useActiveDBStore";
 import { Splitpanes, Pane } from 'splitpanes'
 import 'splitpanes/dist/splitpanes.css'
 
-const storeDBList = databaseListStore()
-const storeActiveConnection = currentConnectionStore()
-const storeActiveDb = activeDBStore()
+const storeDBList = useDatabaseListStore()
+const storeActiveConnection = useCurrentConnectionStore()
+const storeActiveDb = useActiveDBStore()
 
 const activeDbName = ref<string>()
 const router = useRouter()

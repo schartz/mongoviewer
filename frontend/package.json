@@ -8,12 +8,18 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.1.0",
+    "@codemirror/lang-json": "^6.0.0",
+    "@codemirror/theme-one-dark": "^6.1.0",
     "@vueuse/core": "^9.2.0",
+    "add": "^2.0.6",
+    "codemirror": "^6.0.1",
     "notyf": "^3.10.0",
     "nprogress": "^0.2.0",
     "pinia": "^2.0.22",
     "splitpanes": "^3.1.1",
     "vue": "^3.2.25",
+    "vue-codemirror": "^6.1.1",
     "vue-router": "^4.1.5",
     "vue-tippy": "^6.0.0-alpha.63",
     "vuejs-tree": "^3.0.2"
